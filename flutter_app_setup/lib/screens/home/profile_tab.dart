@@ -82,14 +82,18 @@ class ProfileTab extends ConsumerWidget {
                     _buildStatRow(
                       context,
                       'Height',
-                      (user.profile['height'] as double?) != null ? '${user.profile['height']} cm' : 'Not set',
+                      (user.profile['height'] as double?) != null
+                          ? '${user.profile['height']} cm'
+                          : 'Not set',
                       Icons.height,
                     ),
                     const Divider(height: 24),
                     _buildStatRow(
                       context,
                       'Weight',
-                      (user.profile['weight'] as double?) != null ? '${user.profile['weight']} kg' : 'Not set',
+                      (user.profile['weight'] as double?) != null
+                          ? '${user.profile['weight']} kg'
+                          : 'Not set',
                       Icons.monitor_weight,
                     ),
                     const Divider(height: 24),

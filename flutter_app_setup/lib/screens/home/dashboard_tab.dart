@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
 import '../../providers/user_provider.dart';
+import '../../providers/theme_provider.dart';
 import '../exercise/log_exercise_screen.dart';
 import '../water/water_intake_screen.dart';
 import '../meal/log_meal_screen.dart';
@@ -16,6 +17,8 @@ class DashboardTab extends ConsumerWidget {
     // final dashboard = ref.watch(dashboardProvider); // Unused for now
     final todayProgress = ref.watch(todayProgressProvider);
     final activeStreaks = ref.watch(activeStreaksProvider);
+    final themeMode = ref.watch(themeModeProvider);
+    final isDark = themeMode == ThemeMode.dark;
 
     if (user == null) {
       return const Center(child: Text('Please login'));
@@ -25,6 +28,26 @@ class DashboardTab extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Daily Glow'),
         actions: [
+          // Theme Toggle Button
+          IconButton(
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) {
+                return RotationTransition(
+                  turns: animation,
+                  child: child,
+                );
+              },
+              child: Icon(
+                isDark ? Icons.light_mode : Icons.dark_mode,
+                key: ValueKey<bool>(isDark),
+              ),
+            ),
+            tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+            onPressed: () {
+              ref.read(themeModeProvider.notifier).toggleTheme();
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
@@ -84,6 +107,8 @@ class DashboardTab extends ConsumerWidget {
   }
 
   Widget _buildWelcomeCard(BuildContext context, String username) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -93,12 +118,12 @@ class DashboardTab extends ConsumerWidget {
               height: 60,
               width: 60,
               decoration: BoxDecoration(
-                color: AppTheme.primaryLight.withOpacity(0.1),
+                color: primaryColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.waving_hand,
-                color: AppTheme.primaryLight,
+                color: primaryColor,
                 size: 30,
               ),
             ),
@@ -114,8 +139,8 @@ class DashboardTab extends ConsumerWidget {
                   Text(
                     username,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ],
               ),
@@ -138,6 +163,9 @@ class DashboardTab extends ConsumerWidget {
   }
 
   Widget _buildProgressCard(BuildContext context, double progress) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -159,9 +187,10 @@ class DashboardTab extends ConsumerWidget {
                   child: CircularProgressIndicator(
                     value: progress / 100,
                     strokeWidth: 12,
-                    backgroundColor: Colors.grey.shade200,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      AppTheme.primaryLight,
+                    backgroundColor:
+                        isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      primaryColor,
                     ),
                   ),
                 ),
@@ -170,11 +199,11 @@ class DashboardTab extends ConsumerWidget {
                   children: [
                     Text(
                       '${progress.toInt()}%',
-                      style: Theme.of(context).textTheme.headlineLarge
-                          ?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primaryLight,
-                          ),
+                      style:
+                          Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: primaryColor,
+                              ),
                     ),
                     Text(
                       'Complete',
@@ -189,8 +218,8 @@ class DashboardTab extends ConsumerWidget {
               progress < 30
                   ? 'Just getting started! Keep going! 💪'
                   : progress < 70
-                  ? 'Great progress today! 🌟'
-                  : 'Amazing work! You\'re crushing it! 🔥',
+                      ? 'Great progress today! 🌟'
+                      : 'Amazing work! You\'re crushing it! 🔥',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
@@ -217,8 +246,8 @@ class DashboardTab extends ConsumerWidget {
                 Text(
                   'Active Streaks',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),
@@ -267,7 +296,7 @@ class DashboardTab extends ConsumerWidget {
             value: user.waterIntakeHistory.isEmpty
                 ? '0'
                 : user.waterIntakeHistory.last.intakeAmountLiters
-                      .toStringAsFixed(1),
+                    .toStringAsFixed(1),
             color: AppTheme.waterIntake,
           ),
         ),
@@ -417,8 +446,8 @@ class _QuickActionButton extends StatelessWidget {
                 child: Text(
                   label,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
               ),
               Icon(

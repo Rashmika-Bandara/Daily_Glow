@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Light Mode Colors
-  static const Color primaryLight = Color(0xFF2EC4B6); // Teal/Aqua Green
-  static const Color accentLight = Color(0xFFFF9F1C); // Orange
-  static const Color backgroundLight = Color(0xFFF8F9FA);
-  static const Color cardLight = Color(0xFFFFFFFF);
-  static const Color textPrimaryLight = Color(0xFF1A1A1A);
-  static const Color textSecondaryLight = Color(0xFF6B7280);
+  // Light Mode Colors - Professional & Creative
+  static const Color primaryLight = Color(0xFF8CA9FF); // Soft Blue
+  static const Color accentLight = Color(0xFFAAC4F5); // Light Blue
+  static const Color backgroundLight = Color(0xFFFFF8DE); // Soft Cream
+  static const Color cardLight =
+      Color(0xFFFFF2C6); // Light Yellow - No more white!
+  static const Color surfaceLight =
+      Color(0xFFFFFFFF); // White for high contrast areas
+  static const Color inputFieldLight = Color(0xFFF5F8FF); // Soft Blue tint
+  static const Color textPrimaryLight = Color(0xFF1F2937); // Dark Gray
+  static const Color textSecondaryLight = Color(0xFF6B7280); // Medium Gray
 
   // Dark Mode Colors
   static const Color primaryDark = Color(0xFF2EC4B6); // Same teal
@@ -19,21 +23,26 @@ class AppTheme {
   static const Color textSecondaryDark = Color(0xFF9CA3AF);
 
   // Feature-specific colors
-  static const Color waterIntake = Color(0xFF2EC4B6); // Aqua Green
-  static const Color stepTracking = Color(0xFF14B8A6); // Teal
-  static const Color streakAccent = Color(0xFFFF9F1C); // Orange
-  static const Color exerciseColor = Color(0xFF10B981); // Green
-  static const Color mealColor = Color(0xFFF59E0B); // Amber
+  static const Color waterIntake = Color(0xFF8CA9FF); // Soft Blue
+  static const Color stepTracking = Color(0xFFAAC4F5); // Light Blue
+  static const Color streakAccent = Color(0xFFFFA500); // Orange
+  static const Color exerciseColor = Color(0xFF8CA9FF); // Soft Blue
+  static const Color mealColor = Color(0xFFFFD93D); // Golden Yellow
 
-  // Light Theme
+  // Light Theme - Professional & Clean
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.light(
       primary: primaryLight,
       secondary: accentLight,
+      tertiary: surfaceLight,
       surface: cardLight,
       background: backgroundLight,
-      error: const Color(0xFFEF4444),
+      error: const Color(0xFFDC2626),
+      onPrimary: Colors.white,
+      onSecondary: textPrimaryLight,
+      primaryContainer: accentLight,
+      secondaryContainer: surfaceLight,
     ),
     scaffoldBackgroundColor: backgroundLight,
     textTheme: GoogleFonts.interTextTheme().apply(
@@ -53,15 +62,16 @@ class AppTheme {
     ),
     cardTheme: CardThemeData(
       color: cardLight,
-      elevation: 2,
+      elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      shadowColor: Colors.black.withOpacity(0.1),
+      shadowColor: primaryLight.withOpacity(0.15),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryLight,
         foregroundColor: Colors.white,
-        elevation: 0,
+        elevation: 2,
+        shadowColor: primaryLight.withOpacity(0.3),
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         textStyle: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
@@ -69,18 +79,18 @@ class AppTheme {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: cardLight,
+      fillColor: inputFieldLight,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: BorderSide(color: accentLight.withOpacity(0.5)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: BorderSide(color: accentLight.withOpacity(0.5)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: primaryLight, width: 2),
+        borderSide: const BorderSide(color: primaryLight, width: 2.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
