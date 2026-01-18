@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../models/exercise.dart';
-import '../../providers/user_provider.dart';
+import '../../providers/services_provider.dart';
 import '../../config/theme.dart';
 
 class LogExerciseScreen extends ConsumerStatefulWidget {
@@ -20,6 +19,9 @@ class _LogExerciseScreenState extends ConsumerState<LogExerciseScreen> {
   final _notesController = TextEditingController();
 
   String _selectedIntensity = 'moderate';
+  DateTime _selectedDate = DateTime.now();
+  TimeOfDay _selectedTime = TimeOfDay.now();
+
   final List<String> _intensityLevels = [
     'low',
     'moderate',
@@ -48,38 +50,56 @@ class _LogExerciseScreenState extends ConsumerState<LogExerciseScreen> {
     super.dispose();
   }
 
-  void _logExercise() {
+  Future<void> _logExercise() async {
     if (_formKey.currentState!.validate()) {
-      final exercise = Exercise(
-        activityID: DateTime.now().millisecondsSinceEpoch.toString(),
-        activityType: _activityTypeController.text,
-        duration: double.parse(_durationController.text),
-        caloriesBurned: double.parse(_caloriesController.text),
-        intensity: _selectedIntensity,
-        distance: _distanceController.text.isEmpty
-            ? 0
-            : double.parse(_distanceController.text),
-        notes: _notesController.text,
-      );
+      try {
+        final activityService = ref.read(activityServiceProvider);
 
-      exercise.completeActivity();
-      ref.read(userProvider.notifier).logExercise(exercise);
+        // Combine date and time
+        final startDateTime = DateTime(
+          _selectedDate.year,
+          _selectedDate.month,
+          _selectedDate.day,
+          _selectedTime.hour,
+          _selectedTime.minute,
+        );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Exercise logged successfully!'),
-          backgroundColor: AppTheme.exerciseColor,
-        ),
-      );
+        await activityService.logExercise(
+          activityType: _activityTypeController.text,
+          duration: double.parse(_durationController.text),
+          caloriesBurned: double.parse(_caloriesController.text),
+          intensity: _selectedIntensity,
+          startTime: startDateTime,
+          date: _selectedDate,
+          notes: _notesController.text,
+        );
 
-      Navigator.pop(context);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Exercise logged successfully!'),
+              backgroundColor: AppTheme.exerciseColor,
+            ),
+          );
+          Navigator.pop(context);
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Log Exercise')),
+      appBar: AppBar(title: const Text('Log Workout')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -112,6 +132,59 @@ class _LogExerciseScreenState extends ConsumerState<LogExerciseScreen> {
                     selectedColor: AppTheme.exerciseColor.withOpacity(0.3),
                   );
                 }).toList(),
+              ),
+              const SizedBox(height: 24),
+
+              // Date and Time Selection
+              Text(
+                'Workout Date & Time',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: _selectedDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (date != null) {
+                          setState(() {
+                            _selectedDate = date;
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.calendar_today),
+                      label: Text(
+                        '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final time = await showTimePicker(
+                          context: context,
+                          initialTime: _selectedTime,
+                        );
+                        if (time != null) {
+                          setState(() {
+                            _selectedTime = time;
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.access_time),
+                      label: Text(_selectedTime.format(context)),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
 
@@ -228,7 +301,7 @@ class _LogExerciseScreenState extends ConsumerState<LogExerciseScreen> {
                   backgroundColor: AppTheme.exerciseColor,
                 ),
                 child: const Text(
-                  'Log Exercise',
+                  'Log Workout',
                   style: TextStyle(fontSize: 16),
                 ),
               ),

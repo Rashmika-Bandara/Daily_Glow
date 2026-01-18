@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../models/meal.dart';
-import '../../providers/user_provider.dart';
+import '../../providers/services_provider.dart';
 import '../../config/theme.dart';
 
 class LogMealScreen extends ConsumerStatefulWidget {
@@ -32,34 +31,45 @@ class _LogMealScreenState extends ConsumerState<LogMealScreen> {
     super.dispose();
   }
 
-  void _logMeal() {
+  Future<void> _logMeal() async {
     if (_formKey.currentState!.validate()) {
-      final foodItems = _foodItemsController.text
-          .split(',')
-          .map((item) => item.trim())
-          .where((item) => item.isNotEmpty)
-          .toList();
+      try {
+        final foodItems = _foodItemsController.text
+            .split(',')
+            .map((item) => item.trim())
+            .where((item) => item.isNotEmpty)
+            .toList();
 
-      final meal = Meal(
-        mealID: DateTime.now().millisecondsSinceEpoch.toString(),
-        mealType: _selectedMealType,
-        foodItems: foodItems,
-        calories: double.parse(_caloriesController.text),
-        protein: double.parse(_proteinController.text),
-        carbs: double.parse(_carbsController.text),
-        fat: double.parse(_fatController.text),
-      );
+        final activityService = ref.read(activityServiceProvider);
 
-      ref.read(userProvider.notifier).logMeal(meal);
+        await activityService.logMeal(
+          mealType: _selectedMealType,
+          foodItems: foodItems,
+          calories: double.parse(_caloriesController.text),
+          protein: double.parse(_proteinController.text),
+          carbs: double.parse(_carbsController.text),
+          fat: double.parse(_fatController.text),
+        );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Meal logged successfully!'),
-          backgroundColor: AppTheme.mealColor,
-        ),
-      );
-
-      Navigator.pop(context);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Meal logged successfully!'),
+              backgroundColor: AppTheme.mealColor,
+            ),
+          );
+          Navigator.pop(context);
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -218,7 +228,9 @@ class _LogMealScreenState extends ConsumerState<LogMealScreen> {
                       children: [
                         Text(
                           'Macro Breakdown',
-                          style: Theme.of(context).textTheme.titleSmall
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 12),
@@ -277,8 +289,7 @@ class _LogMealScreenState extends ConsumerState<LogMealScreen> {
   }
 
   Widget _buildMacroBar(String label, double value, Color color) {
-    final total =
-        (double.tryParse(_proteinController.text) ?? 0) +
+    final total = (double.tryParse(_proteinController.text) ?? 0) +
         (double.tryParse(_carbsController.text) ?? 0) +
         (double.tryParse(_fatController.text) ?? 0);
     final percentage = total > 0 ? (value / total) : 0.0;

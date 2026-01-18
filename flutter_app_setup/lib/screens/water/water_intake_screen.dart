@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/user_provider.dart';
-import '../../models/model_extensions.dart';
+import '../../providers/services_provider.dart';
 import '../../config/theme.dart';
 
 class WaterIntakeScreen extends ConsumerStatefulWidget {
@@ -20,15 +19,30 @@ class _WaterIntakeScreenState extends ConsumerState<WaterIntakeScreen> {
     super.dispose();
   }
 
-  void _logWater(double amount) {
-    ref.read(userProvider.notifier).logWaterIntake(amount);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Logged ${amount}L of water!'),
-        backgroundColor: AppTheme.waterIntake,
-        duration: const Duration(seconds: 1),
-      ),
-    );
+  Future<void> _logWater(double amount) async {
+    try {
+      final activityService = ref.read(activityServiceProvider);
+      await activityService.logWater(amount: amount);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Logged ${amount}L of water!'),
+            backgroundColor: AppTheme.waterIntake,
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _logCustomAmount() {
@@ -42,11 +56,9 @@ class _WaterIntakeScreenState extends ConsumerState<WaterIntakeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(userProvider);
-    final todayTotal = user?.waterIntakeHistory.isNotEmpty == true
-        ? user!.waterIntakeHistory.last.intakeAmountLiters
-        : 0.0;
-    final dailyGoal = user?.dailyWaterTarget ?? 2.5;
+    // For now, using placeholder values since we're not tracking state in UI yet
+    const todayTotal = 0.0;
+    const dailyGoal = 2.5;
     final progress = (todayTotal / dailyGoal).clamp(0.0, 1.0);
 
     return Scaffold(

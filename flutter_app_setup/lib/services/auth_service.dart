@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'notification_service.dart';
 
 /// Authentication Service
 /// Handles user authentication with Firebase Auth
 class AuthService {
   final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final NotificationService _notificationService = NotificationService();
 
   // Get current Firebase user
   firebase_auth.User? get currentUser => _auth.currentUser;
@@ -18,6 +20,11 @@ class AuthService {
     required String email,
     required String password,
     required String username,
+    required String gender,
+    required String avatar,
+    int? age,
+    double? height,
+    double? weight,
   }) async {
     try {
       // Create Firebase user
@@ -28,15 +35,27 @@ class AuthService {
 
       if (userCredential.user == null) return null;
 
+      final userId = userCredential.user!.uid;
+
       // Update display name
       await userCredential.user!.updateDisplayName(username);
 
-      // Create basic user profile in Firestore
-      await _firestore.collection('users').doc(userCredential.user!.uid).set({
+      // Create comprehensive user profile in Firestore
+      await _firestore.collection('users').doc(userId).set({
+        'userId': userId,
         'username': username,
         'email': email,
+        'gender': gender,
+        'avatar': avatar,
+        'age': age,
+        'height': height,
+        'weight': weight,
         'createdAt': DateTime.now().toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
       });
+
+      // Send welcome notification
+      await _notificationService.sendWelcomeNotification(username);
 
       return userCredential.user;
     } on firebase_auth.FirebaseAuthException catch (e) {
@@ -56,6 +75,26 @@ class AuthService {
         email: email,
         password: password,
       );
+
+      // Check if this is the first login (check if welcome notification exists)
+      if (userCredential.user != null) {
+        final notificationsSnapshot = await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .collection('notifications')
+            .limit(1)
+            .get();
+
+        // If no notifications exist, send welcome notification
+        if (notificationsSnapshot.docs.isEmpty) {
+          final userDoc = await _firestore
+              .collection('users')
+              .doc(userCredential.user!.uid)
+              .get();
+          final username = userDoc.data()?['username'] ?? 'User';
+          await _notificationService.sendWelcomeNotification(username);
+        }
+      }
 
       return userCredential.user;
     } on firebase_auth.FirebaseAuthException catch (e) {

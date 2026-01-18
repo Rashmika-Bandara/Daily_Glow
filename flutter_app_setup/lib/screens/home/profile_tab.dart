@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
 import '../../providers/services_provider.dart';
+import '../../widgets/avatar_selector.dart';
 import '../auth/login_screen.dart';
+import '../notifications/notifications_screen.dart';
 
 class ProfileTab extends ConsumerWidget {
   const ProfileTab({super.key});
@@ -27,9 +29,16 @@ class ProfileTab extends ConsumerWidget {
 
     final username = userData.value?['username'] ?? 'User';
     final email = userData.value?['email'] ?? '';
+    final avatar = userData.value?['avatar'] as String? ?? 'boy';
+    final gender = userData.value?['gender'] as String? ?? 'Not set';
+    final age = userData.value?['age'] as int?;
+    final height = userData.value?['height'] as double?;
+    final weight = userData.value?['weight'] as double?;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(
+        title: const Text('Profile'),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -40,21 +49,7 @@ class ProfileTab extends ConsumerWidget {
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withOpacity(0.1),
-                      child: Text(
-                        username[0].toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
+                    AvatarDisplay(avatar: avatar, size: 100),
                     const SizedBox(height: 16),
                     Text(
                       username,
@@ -82,7 +77,7 @@ class ProfileTab extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Statistics',
+                      'Personal Information',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -90,30 +85,34 @@ class ProfileTab extends ConsumerWidget {
                     const SizedBox(height: 16),
                     _buildStatRow(
                       context,
+                      'Gender',
+                      gender[0].toUpperCase() + gender.substring(1),
+                      Icons.person_outline,
+                    ),
+                    const Divider(height: 24),
+                    _buildStatRow(
+                      context,
                       'Age',
-                      'Not set',
+                      age != null ? '$age years' : 'Not set',
                       Icons.cake,
                     ),
                     const Divider(height: 24),
                     _buildStatRow(
                       context,
                       'Height',
-                      'Not set',
+                      height != null
+                          ? '${height.toStringAsFixed(0)} cm'
+                          : 'Not set',
                       Icons.height,
                     ),
                     const Divider(height: 24),
                     _buildStatRow(
                       context,
                       'Weight',
-                      'Not set',
+                      weight != null
+                          ? '${weight.toStringAsFixed(1)} kg'
+                          : 'Not set',
                       Icons.monitor_weight,
-                    ),
-                    const Divider(height: 24),
-                    _buildStatRow(
-                      context,
-                      'Fitness Level',
-                      'Not set',
-                      Icons.sports_score,
                     ),
                   ],
                 ),
@@ -142,8 +141,11 @@ class ProfileTab extends ConsumerWidget {
               'Notifications',
               Icons.notifications,
               () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Notifications coming soon!')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const NotificationsScreen(),
+                  ),
                 );
               },
             ),

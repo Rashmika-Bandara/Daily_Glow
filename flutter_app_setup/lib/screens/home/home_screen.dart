@@ -4,6 +4,8 @@ import 'dashboard_tab.dart';
 import 'workouts_tab.dart';
 import 'progress_tab.dart';
 import 'profile_tab.dart';
+import '../meal/meals_tab.dart';
+import '../water/water_tab.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +20,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final List<Widget> _screens = const [
     DashboardTab(),
     WorkoutsTab(),
+    MealsTab(),
+    WaterTab(),
     ProgressTab(),
     ProfileTab(),
   ];
@@ -46,6 +50,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: Icon(Icons.fitness_center_outlined),
             activeIcon: Icon(Icons.fitness_center),
             label: 'Workouts',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.restaurant_outlined),
+            activeIcon: Icon(Icons.restaurant),
+            label: 'Meals',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.water_drop_outlined),
+            activeIcon: Icon(Icons.water_drop),
+            label: 'Water',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.show_chart_outlined),

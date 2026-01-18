@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
 import '../../providers/services_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../widgets/avatar_selector.dart';
 import '../exercise/log_exercise_screen.dart';
 import '../water/water_intake_screen.dart';
 import '../meal/log_meal_screen.dart';
 import '../goals/goals_screen.dart';
+import '../notifications/notifications_screen.dart';
 
 class DashboardTab extends ConsumerWidget {
   const DashboardTab({super.key});
@@ -59,11 +61,59 @@ class DashboardTab extends ConsumerWidget {
               ref.read(themeModeProvider.notifier).toggleTheme();
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Notifications coming soon!')),
+          // Notification icon with badge
+          Consumer(
+            builder: (context, ref, child) {
+              final unreadCount = ref.watch(unreadCountProvider);
+              return unreadCount.when(
+                data: (count) => Stack(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.notifications_outlined),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NotificationsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    if (count > 0)
+                      Positioned(
+                        right: 8,
+                        top: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            count > 9 ? '9+' : '$count',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                loading: () => IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () {},
+                ),
+                error: (_, __) => IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () {},
+                ),
               );
             },
           ),
@@ -75,7 +125,7 @@ class DashboardTab extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Welcome Card
-            _buildWelcomeCard(context, username),
+            _buildWelcomeCard(context, username, ref),
             const SizedBox(height: 20),
 
             // Progress Ring
@@ -103,73 +153,143 @@ class DashboardTab extends ConsumerWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const LogExerciseScreen()),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Log Activity'),
-      ),
     );
   }
 
-  Widget _buildWelcomeCard(BuildContext context, String username) {
+  Widget _buildWelcomeCard(
+      BuildContext context, String username, WidgetRef ref) {
     final primaryColor = Theme.of(context).colorScheme.primary;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            Container(
-              height: 60,
-              width: 60,
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
+    return ref.watch(currentUserDataProvider).when(
+          data: (userData) {
+            final avatar = userData?['avatar'] as String? ?? 'boy';
+
+            return Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    AvatarDisplay(avatar: avatar, size: 60),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Welcome back,',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          Text(
+                            username,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.streakAccent.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.local_fire_department,
+                        color: AppTheme.streakAccent,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: Icon(
-                Icons.waving_hand,
-                color: primaryColor,
-                size: 30,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            );
+          },
+          loading: () => Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
                 children: [
-                  Text(
-                    'Welcome back,',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                  Container(
+                    height: 60,
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.waving_hand,
+                      color: primaryColor,
+                      size: 30,
+                    ),
                   ),
-                  Text(
-                    username,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome back,',
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
+                        Text(
+                          username,
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppTheme.streakAccent.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.local_fire_department,
-                color: AppTheme.streakAccent,
+          ),
+          error: (_, __) => Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    height: 60,
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.waving_hand,
+                      color: primaryColor,
+                      size: 30,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome back,',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        Text(
+                          username,
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        );
   }
 
   Widget _buildProgressCard(BuildContext context, double progress) {
@@ -328,7 +448,7 @@ class DashboardTab extends ConsumerWidget {
       children: [
         _QuickActionButton(
           icon: Icons.fitness_center,
-          label: 'Log Exercise',
+          label: 'Log Workout',
           color: AppTheme.exerciseColor,
           onTap: () {
             Navigator.push(
