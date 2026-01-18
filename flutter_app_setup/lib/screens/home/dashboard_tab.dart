@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
-import '../../providers/user_provider.dart';
+import '../../providers/services_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../exercise/log_exercise_screen.dart';
 import '../water/water_intake_screen.dart';
@@ -13,16 +13,27 @@ class DashboardTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider);
-    // final dashboard = ref.watch(dashboardProvider); // Unused for now
-    final todayProgress = ref.watch(todayProgressProvider);
-    final activeStreaks = ref.watch(activeStreaksProvider);
+    final authUser = ref.watch(authStateProvider);
+    final userData = ref.watch(currentUserDataProvider);
     final themeMode = ref.watch(themeModeProvider);
     final isDark = themeMode == ThemeMode.dark;
 
-    if (user == null) {
-      return const Center(child: Text('Please login'));
+    // Check authentication and user data
+    if (authUser.isLoading || userData.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
+
+    if (authUser.value == null || userData.value == null) {
+      return const Scaffold(
+        body: Center(child: Text('Please login')),
+      );
+    }
+
+    final username = userData.value?['username'] ?? 'User';
+    final todayProgress = 65.0; // Mock data for now
+    final activeStreaks = <String>[]; // Mock data for now
 
     return Scaffold(
       appBar: AppBar(
@@ -64,7 +75,7 @@ class DashboardTab extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Welcome Card
-            _buildWelcomeCard(context, user.username),
+            _buildWelcomeCard(context, username),
             const SizedBox(height: 20),
 
             // Progress Ring
@@ -78,7 +89,6 @@ class DashboardTab extends ConsumerWidget {
             ],
 
             // Quick Stats
-            _buildQuickStats(context, user),
             const SizedBox(height: 20),
 
             // Quick Actions
@@ -277,7 +287,7 @@ class DashboardTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuickStats(BuildContext context, user) {
+  Widget _buildQuickStats(BuildContext context, dynamic user) {
     return Row(
       children: [
         Expanded(

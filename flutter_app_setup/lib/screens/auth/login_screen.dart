@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
-import '../../providers/user_provider.dart';
+import '../../providers/services_provider.dart';
 import '../home/home_screen.dart';
 import 'register_screen.dart';
 
@@ -30,28 +30,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      // Simulate network delay
-      await Future.delayed(const Duration(seconds: 1));
-
-      // For demo purposes, create a user if none exists
-      // In production, this would authenticate against a backend
-      final success = ref
-          .read(userProvider.notifier)
-          .createAccount(
-            userID: DateTime.now().millisecondsSinceEpoch.toString(),
-            username: _emailController.text.split('@')[0],
-            email: _emailController.text,
-            password: _passwordController.text,
-          );
-
-      setState(() => _isLoading = false);
-
-      if (success && mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
+      try {
+        final authService = ref.read(authServiceProvider);
+        final user = await authService.signInWithEmail(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
         );
-      } else {
-        _showErrorDialog('Login failed. Please try again.');
+
+        setState(() => _isLoading = false);
+
+        if (user != null && mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
+        }
+      } catch (e) {
+        setState(() => _isLoading = false);
+        _showErrorDialog(e.toString());
       }
     }
   }
@@ -108,8 +103,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Text(
                   'Welcome Back',
                   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                   textAlign: TextAlign.center,
                 ),
 
@@ -118,10 +113,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Text(
                   'Continue your fitness journey',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: isDark
-                        ? AppTheme.textSecondaryDark
-                        : AppTheme.textSecondaryLight,
-                  ),
+                        color: isDark
+                            ? AppTheme.textSecondaryDark
+                            : AppTheme.textSecondaryLight,
+                      ),
                   textAlign: TextAlign.center,
                 ),
 

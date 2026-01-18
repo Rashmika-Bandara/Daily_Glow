@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
-import '../../providers/user_provider.dart';
+import '../../providers/services_provider.dart';
 import '../auth/login_screen.dart';
 
 class ProfileTab extends ConsumerWidget {
@@ -9,11 +9,24 @@ class ProfileTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider);
+    final authUser = ref.watch(authStateProvider);
+    final userData = ref.watch(currentUserDataProvider);
 
-    if (user == null) {
-      return const Center(child: Text('Please login'));
+    // Check authentication and loading states
+    if (authUser.isLoading || userData.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
+
+    if (authUser.value == null || userData.value == null) {
+      return const Scaffold(
+        body: Center(child: Text('Please login')),
+      );
+    }
+
+    final username = userData.value?['username'] ?? 'User';
+    final email = userData.value?['email'] ?? '';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
@@ -29,19 +42,22 @@ class ProfileTab extends ConsumerWidget {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundColor: AppTheme.primaryLight.withOpacity(0.1),
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.1),
                       child: Text(
-                        user.username[0].toUpperCase(),
-                        style: const TextStyle(
+                        username[0].toUpperCase(),
+                        style: TextStyle(
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
-                          color: AppTheme.primaryLight,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      user.username,
+                      username,
                       style: Theme.of(context)
                           .textTheme
                           .headlineSmall
@@ -49,7 +65,7 @@ class ProfileTab extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      user.email,
+                      email,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
@@ -75,32 +91,28 @@ class ProfileTab extends ConsumerWidget {
                     _buildStatRow(
                       context,
                       'Age',
-                      (user.profile['age'] as int?)?.toString() ?? 'Not set',
+                      'Not set',
                       Icons.cake,
                     ),
                     const Divider(height: 24),
                     _buildStatRow(
                       context,
                       'Height',
-                      (user.profile['height'] as double?) != null
-                          ? '${user.profile['height']} cm'
-                          : 'Not set',
+                      'Not set',
                       Icons.height,
                     ),
                     const Divider(height: 24),
                     _buildStatRow(
                       context,
                       'Weight',
-                      (user.profile['weight'] as double?) != null
-                          ? '${user.profile['weight']} kg'
-                          : 'Not set',
+                      'Not set',
                       Icons.monitor_weight,
                     ),
                     const Divider(height: 24),
                     _buildStatRow(
                       context,
                       'Fitness Level',
-                      (user.profile['fitnessLevel'] as String?) ?? 'Not set',
+                      'Not set',
                       Icons.sports_score,
                     ),
                   ],
@@ -146,12 +158,14 @@ class ProfileTab extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  ref.read(userProvider.notifier).logout();
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    (route) => false,
-                  );
+                onPressed: () async {
+                  await ref.read(authServiceProvider).signOut();
+                  if (context.mounted) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (route) => false,
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,

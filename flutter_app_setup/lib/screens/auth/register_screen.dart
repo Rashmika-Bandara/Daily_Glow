@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme.dart';
-import '../../providers/user_provider.dart';
+import '../../providers/services_provider.dart';
 import '../home/home_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -34,26 +34,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      // Simulate network delay
-      await Future.delayed(const Duration(seconds: 1));
+      try {
+        final authService = ref.read(authServiceProvider);
+        final user = await authService.signUpWithEmail(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          username: _usernameController.text.trim(),
+        );
 
-      final success = ref
-          .read(userProvider.notifier)
-          .createAccount(
-            userID: DateTime.now().millisecondsSinceEpoch.toString(),
-            username: _usernameController.text,
-            email: _emailController.text,
-            password: _passwordController.text,
+        setState(() => _isLoading = false);
+
+        if (user != null && mounted) {
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Account created successfully!')),
           );
 
-      setState(() => _isLoading = false);
-
-      if (success && mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
-      } else {
-        _showErrorDialog('Registration failed. Please try again.');
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
+        }
+      } catch (e) {
+        setState(() => _isLoading = false);
+        _showErrorDialog(e.toString());
       }
     }
   }
@@ -97,8 +100,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Text(
                   'Create Account',
                   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                   textAlign: TextAlign.center,
                 ),
 
@@ -107,10 +110,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Text(
                   'Start your fitness journey today',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: isDark
-                        ? AppTheme.textSecondaryDark
-                        : AppTheme.textSecondaryLight,
-                  ),
+                        color: isDark
+                            ? AppTheme.textSecondaryDark
+                            : AppTheme.textSecondaryLight,
+                      ),
                   textAlign: TextAlign.center,
                 ),
 
@@ -256,10 +259,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Text(
                   'By creating an account, you agree to our Terms of Service and Privacy Policy',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isDark
-                        ? AppTheme.textSecondaryDark
-                        : AppTheme.textSecondaryLight,
-                  ),
+                        color: isDark
+                            ? AppTheme.textSecondaryDark
+                            : AppTheme.textSecondaryLight,
+                      ),
                   textAlign: TextAlign.center,
                 ),
 
