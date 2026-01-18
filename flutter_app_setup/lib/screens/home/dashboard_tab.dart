@@ -40,6 +40,8 @@ class DashboardTab extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daily Glow'),
+        backgroundColor: isDark ? null : const Color(0xFFD6A3F7),
+        foregroundColor: isDark ? null : Colors.white,
         actions: [
           // Theme Toggle Button
           IconButton(
@@ -119,38 +121,57 @@ class DashboardTab extends ConsumerWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Welcome Card
-            _buildWelcomeCard(context, username, ref),
-            const SizedBox(height: 20),
-
-            // Progress Ring
-            _buildProgressCard(context, todayProgress),
-            const SizedBox(height: 20),
-
-            // Streaks
-            if (activeStreaks.isNotEmpty) ...[
-              _buildStreaksCard(context, activeStreaks),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [
+                    const Color(0xFF0F2027),
+                    const Color(0xFF203A43),
+                    const Color(0xFF2C5364),
+                  ]
+                : [
+                    const Color(0xFF4158D0),
+                    const Color(0xFFC850C0),
+                    const Color(0xFFFFCC70),
+                  ],
+          ),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Welcome Card
+              _buildWelcomeCard(context, username, ref),
               const SizedBox(height: 20),
+
+              // Progress Ring
+              _buildProgressCard(context, todayProgress),
+              const SizedBox(height: 20),
+
+              // Streaks
+              if (activeStreaks.isNotEmpty) ...[
+                _buildStreaksCard(context, activeStreaks),
+                const SizedBox(height: 20),
+              ],
+
+              // Quick Stats
+              const SizedBox(height: 20),
+
+              // Quick Actions
+              Text(
+                'Quick Actions',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              _buildQuickActions(context),
             ],
-
-            // Quick Stats
-            const SizedBox(height: 20),
-
-            // Quick Actions
-            Text(
-              'Quick Actions',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            _buildQuickActions(context),
-          ],
+          ),
         ),
       ),
     );
@@ -158,18 +179,58 @@ class DashboardTab extends ConsumerWidget {
 
   Widget _buildWelcomeCard(
       BuildContext context, String username, WidgetRef ref) {
-    final primaryColor = Theme.of(context).colorScheme.primary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ref.watch(currentUserDataProvider).when(
           data: (userData) {
             final avatar = userData?['avatar'] as String? ?? 'boy';
 
-            return Card(
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [
+                          const Color(0xFF0F2027),
+                          const Color(0xFF203A43),
+                          const Color(0xFF2C5364),
+                        ]
+                      : [
+                          const Color(0xFF00B4DB),
+                          const Color(0xFF0083B0),
+                        ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primaryLight.withOpacity(0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
-                    AvatarDisplay(avatar: avatar, size: 60),
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 3,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: AvatarDisplay(avatar: avatar, size: 60),
+                    ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
@@ -177,7 +238,12 @@ class DashboardTab extends ConsumerWidget {
                         children: [
                           Text(
                             'Welcome back,',
-                            style: Theme.of(context).textTheme.bodyMedium,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Colors.white.withOpacity(0.9),
+                                ),
                           ),
                           Text(
                             username,
@@ -186,20 +252,26 @@ class DashboardTab extends ConsumerWidget {
                                 .titleLarge
                                 ?.copyWith(
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                           ),
                         ],
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppTheme.streakAccent.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 2,
+                        ),
                       ),
                       child: const Icon(
                         Icons.local_fire_department,
-                        color: AppTheme.streakAccent,
+                        color: Colors.orange,
+                        size: 28,
                       ),
                     ),
                   ],
@@ -216,12 +288,12 @@ class DashboardTab extends ConsumerWidget {
                     height: 60,
                     width: 60,
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
+                      color: AppTheme.primaryLight.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.waving_hand,
-                      color: primaryColor,
+                      color: AppTheme.primaryLight,
                       size: 30,
                     ),
                   ),
@@ -257,12 +329,12 @@ class DashboardTab extends ConsumerWidget {
                     height: 60,
                     width: 60,
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
+                      color: AppTheme.primaryLight.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.waving_hand,
-                      color: primaryColor,
+                      color: AppTheme.primaryLight,
                       size: 30,
                     ),
                   ),
@@ -296,7 +368,30 @@ class DashboardTab extends ConsumerWidget {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [
+                  const Color(0xFF1E3A8A),
+                  const Color(0xFF3B82F6),
+                ]
+              : [
+                  const Color(0xFF60A5FA),
+                  const Color(0xFF93C5FD),
+                ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -305,7 +400,10 @@ class DashboardTab extends ConsumerWidget {
               'Today\'s Progress',
               style: Theme.of(
                 context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
             ),
             const SizedBox(height: 20),
             Stack(
@@ -316,11 +414,10 @@ class DashboardTab extends ConsumerWidget {
                   width: 150,
                   child: CircularProgressIndicator(
                     value: progress / 100,
-                    strokeWidth: 12,
-                    backgroundColor:
-                        isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      primaryColor,
+                    strokeWidth: 14,
+                    backgroundColor: Colors.white.withOpacity(0.3),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Colors.white,
                     ),
                   ),
                 ),
@@ -332,12 +429,14 @@ class DashboardTab extends ConsumerWidget {
                       style:
                           Theme.of(context).textTheme.headlineLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: primaryColor,
+                                color: Colors.white,
                               ),
                     ),
                     Text(
                       'Complete',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.white.withOpacity(0.9),
+                          ),
                     ),
                   ],
                 ),

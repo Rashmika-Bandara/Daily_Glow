@@ -34,12 +34,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
+        backgroundColor: isDark ? null : const Color(0xFFD6A3F7),
+        selectedItemColor: isDark ? null : Colors.white,
+        unselectedItemColor: isDark ? null : Colors.white.withOpacity(0.6),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_outlined),
