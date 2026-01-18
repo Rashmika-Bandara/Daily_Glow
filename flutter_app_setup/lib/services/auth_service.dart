@@ -166,6 +166,43 @@ class AuthService {
     }
   }
 
+  /// Update user profile in Firestore
+  Future<void> updateProfile({
+    String? username,
+    String? gender,
+    String? avatar,
+    int? age,
+    double? height,
+    double? weight,
+  }) async {
+    try {
+      final userId = currentUser?.uid;
+      if (userId == null) {
+        throw Exception('No user signed in');
+      }
+
+      final updates = <String, dynamic>{
+        'updatedAt': DateTime.now().toIso8601String(),
+      };
+
+      if (username != null) updates['username'] = username;
+      if (gender != null) updates['gender'] = gender;
+      if (avatar != null) updates['avatar'] = avatar;
+      if (age != null) updates['age'] = age;
+      if (height != null) updates['height'] = height;
+      if (weight != null) updates['weight'] = weight;
+
+      await _firestore.collection('users').doc(userId).update(updates);
+
+      // Update display name if username changed
+      if (username != null) {
+        await currentUser?.updateDisplayName(username);
+      }
+    } catch (e) {
+      throw Exception('Profile update failed: $e');
+    }
+  }
+
   /// Check if user is signed in
   bool isSignedIn() {
     return currentUser != null;

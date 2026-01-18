@@ -160,7 +160,7 @@ class ProgressTab extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '${goal.currentValue.toInt()} / ${goal.targetValue.toInt()} ${goal is GoalForPhysicalActivity ? (goal as GoalForPhysicalActivity).unit : 'L'}',
+                            '${goal.currentValue.toInt()} / ${goal.targetValue.toInt()} ${goal is GoalForPhysicalActivity ? goal.unit : 'L'}',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],

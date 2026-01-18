@@ -5,6 +5,8 @@ import '../../providers/services_provider.dart';
 import '../../widgets/avatar_selector.dart';
 import '../auth/login_screen.dart';
 import '../notifications/notifications_screen.dart';
+import '../profile/edit_profile_screen.dart';
+import '../theme/theme_selection_screen.dart';
 
 class ProfileTab extends ConsumerWidget {
   const ProfileTab({super.key});
@@ -13,6 +15,7 @@ class ProfileTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authUser = ref.watch(authStateProvider);
     final userData = ref.watch(currentUserDataProvider);
+    final unreadCount = ref.watch(unreadCountProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Check authentication and loading states
@@ -147,8 +150,11 @@ class ProfileTab extends ConsumerWidget {
 
               // Settings Options
               _buildSettingsOption(context, 'Edit Profile', Icons.edit, () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Edit profile coming soon!')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const EditProfileScreen(),
+                  ),
                 );
               }),
               _buildSettingsOption(
@@ -173,10 +179,14 @@ class ProfileTab extends ConsumerWidget {
                     ),
                   );
                 },
+                badgeCount: unreadCount.value ?? 0,
               ),
               _buildSettingsOption(context, 'Theme', Icons.palette, () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Theme settings coming soon!')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ThemeSelectionScreen(),
+                  ),
                 );
               }),
               const SizedBox(height: 20),
@@ -245,14 +255,52 @@ class ProfileTab extends ConsumerWidget {
     BuildContext context,
     String title,
     IconData icon,
-    VoidCallback onTap,
-  ) {
+    VoidCallback onTap, {
+    int? badgeCount,
+  }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final showBadge = badgeCount != null && badgeCount > 0;
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       color: isDark ? null : Colors.white.withOpacity(0.95),
       child: ListTile(
-        leading: Icon(icon, color: AppTheme.primaryLight),
+        leading: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Icon(icon, color: AppTheme.primaryLight),
+            if (showBadge)
+              Positioned(
+                right: -8,
+                top: -8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isDark ? Colors.grey.shade800 : Colors.white,
+                      width: 2,
+                    ),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 20,
+                    minHeight: 20,
+                  ),
+                  child: Center(
+                    child: Text(
+                      badgeCount! > 99 ? '99+' : badgeCount.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
         title: Text(
           title,
           style: TextStyle(color: isDark ? null : Colors.black87),

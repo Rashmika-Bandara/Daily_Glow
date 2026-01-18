@@ -171,7 +171,7 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '${goal.currentValue.toInt()} / ${goal.targetValue.toInt()} ${goal is GoalForPhysicalActivity ? (goal as GoalForPhysicalActivity).unit : 'L'}',
+                                '${goal.currentValue.toInt()} / ${goal.targetValue.toInt()} ${goal is GoalForPhysicalActivity ? goal.unit : 'L'}',
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                               Text(
@@ -198,7 +198,7 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Target: ${goal.targetValue.toInt()} ${goal is GoalForPhysicalActivity ? (goal as GoalForPhysicalActivity).unit : 'L'}',
+                                'Target: ${goal.targetValue.toInt()} ${goal is GoalForPhysicalActivity ? goal.unit : 'L'}',
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ],

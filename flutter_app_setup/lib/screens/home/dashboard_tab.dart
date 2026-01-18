@@ -506,42 +506,6 @@ class DashboardTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuickStats(BuildContext context, dynamic user) {
-    return Row(
-      children: [
-        Expanded(
-          child: _StatCard(
-            icon: Icons.fitness_center,
-            title: 'Exercises',
-            value: user.exerciseHistory.length.toString(),
-            color: AppTheme.exerciseColor,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _StatCard(
-            icon: Icons.water_drop,
-            title: 'Water (L)',
-            value: user.waterIntakeHistory.isEmpty
-                ? '0'
-                : user.waterIntakeHistory.last.intakeAmountLiters
-                    .toStringAsFixed(1),
-            color: AppTheme.waterIntake,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _StatCard(
-            icon: Icons.restaurant,
-            title: 'Meals',
-            value: user.meals.length.toString(),
-            color: AppTheme.mealColor,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildQuickActions(BuildContext context) {
     return Column(
       children: [
@@ -593,47 +557,6 @@ class DashboardTab extends ConsumerWidget {
           },
         ),
       ],
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-  final Color color;
-
-  const _StatCard({
-    required this.icon,
-    required this.title,
-    required this.value,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Icon(icon, size: 32, color: color),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.bodySmall,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

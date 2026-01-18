@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "867927966760",
+    "project_id": "daily-glow-eccbd",
+    "storage_bucket": "daily-glow-eccbd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:867927966760:android:17a583fdf1885e8b01211d",
+        "android_client_info": {
+          "package_name": "com.example.daily_glow_templates"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCt7nzLNmuM3YO9O9fAIcQGeYakNS3-4-Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
