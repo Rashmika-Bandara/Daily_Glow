@@ -101,7 +101,7 @@ class _WaterIntakeScreenState extends ConsumerState<WaterIntakeScreen> {
                           child: CircularProgressIndicator(
                             value: progress,
                             strokeWidth: 16,
-                            backgroundColor: Colors.grey.shade200,
+                            backgroundColor: const Color(0xFF9E9E9E),
                             valueColor: const AlwaysStoppedAnimation<Color>(
                               AppTheme.waterIntake,
                             ),
