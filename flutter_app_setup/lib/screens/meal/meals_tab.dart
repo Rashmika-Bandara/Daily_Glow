@@ -48,7 +48,7 @@ class _MealsTabState extends ConsumerState<MealsTab> {
                         const Icon(
                           Icons.restaurant,
                           size: 50,
-                          color: AppTheme.mealColor,
+                          color: AppTheme.exerciseColor,
                         ),
                         const SizedBox(height: 12),
                         Text(
@@ -58,7 +58,7 @@ class _MealsTabState extends ConsumerState<MealsTab> {
                               .headlineLarge
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: AppTheme.mealColor,
+                                color: AppTheme.exerciseColor,
                               ),
                         ),
                         const SizedBox(height: 4),
@@ -161,7 +161,7 @@ class _MealsTabState extends ConsumerState<MealsTab> {
         },
         icon: const Icon(Icons.add),
         label: const Text('Log Meal'),
-        backgroundColor: AppTheme.mealColor,
+        backgroundColor: AppTheme.exerciseColor,
       ),
     );
   }
@@ -204,7 +204,7 @@ class _MealsTabState extends ConsumerState<MealsTab> {
               children: [
                 Icon(
                   _getMealIcon(mealType),
-                  color: AppTheme.mealColor,
+                  color: AppTheme.exerciseColor,
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -220,7 +220,7 @@ class _MealsTabState extends ConsumerState<MealsTab> {
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
-                      ?.copyWith(color: AppTheme.mealColor),
+                      ?.copyWith(color: AppTheme.exerciseColor),
                 ),
               ],
             ),
@@ -259,14 +259,14 @@ class _MealsTabState extends ConsumerState<MealsTab> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppTheme.mealColor.withOpacity(0.1),
+        color: AppTheme.exerciseColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         text,
         style: const TextStyle(
           fontSize: 12,
-          color: AppTheme.mealColor,
+          color: AppTheme.exerciseColor,
         ),
       ),
     );
