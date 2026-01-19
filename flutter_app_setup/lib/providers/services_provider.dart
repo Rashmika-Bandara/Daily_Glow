@@ -3,6 +3,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/auth_service.dart';
 import '../services/activity_service.dart';
 import '../services/notification_service.dart';
+import '../services/daily_workout_service.dart';
+import '../services/daily_meal_service.dart';
+import '../services/daily_water_service.dart';
+
+export '../services/auth_service.dart';
+export '../services/activity_service.dart';
+export '../services/notification_service.dart';
+export '../services/daily_workout_service.dart';
+export '../services/daily_meal_service.dart';
+export '../services/daily_water_service.dart';
 
 /// Auth Service Provider
 final authServiceProvider = Provider<AuthService>((ref) {
@@ -17,6 +27,21 @@ final activityServiceProvider = Provider<ActivityService>((ref) {
 /// Notification Service Provider
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
+});
+
+/// Daily Workout Service Provider
+final dailyWorkoutServiceProvider = Provider<DailyWorkoutService>((ref) {
+  return DailyWorkoutService();
+});
+
+/// Daily Meal Service Provider
+final dailyMealServiceProvider = Provider<DailyMealService>((ref) {
+  return DailyMealService();
+});
+
+/// Daily Water Service Provider
+final dailyWaterServiceProvider = Provider<DailyWaterService>((ref) {
+  return DailyWaterService();
 });
 
 /// Current Auth User Stream Provider

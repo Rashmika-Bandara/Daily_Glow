@@ -212,6 +212,47 @@ class AuthService {
     return currentUser != null;
   }
 
+  /// Save plan start date
+  Future<void> savePlanStartDate(DateTime startDate) async {
+    try {
+      final userId = currentUser?.uid;
+      if (userId == null) {
+        throw Exception('No user signed in');
+      }
+
+      await _firestore.collection('users').doc(userId).update({
+        'planStartDate': startDate.toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
+    } catch (e) {
+      throw Exception('Failed to save plan start date: $e');
+    }
+  }
+
+  /// Get plan start date
+  Future<DateTime?> getPlanStartDate() async {
+    try {
+      final userId = currentUser?.uid;
+      if (userId == null) return null;
+
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      final planStartDateStr = userDoc.data()?['planStartDate'] as String?;
+
+      if (planStartDateStr != null) {
+        return DateTime.parse(planStartDateStr);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Check if plan start date is set
+  Future<bool> hasPlanStartDate() async {
+    final startDate = await getPlanStartDate();
+    return startDate != null;
+  }
+
   /// Handle Firebase Auth exceptions
   String _handleAuthException(firebase_auth.FirebaseAuthException e) {
     switch (e.code) {

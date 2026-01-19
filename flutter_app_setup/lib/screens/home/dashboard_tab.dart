@@ -4,6 +4,7 @@ import '../../config/theme.dart';
 import '../../providers/services_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../widgets/avatar_selector.dart';
+import '../../widgets/start_date_dialog.dart';
 import '../exercise/log_exercise_screen.dart';
 import '../water/water_intake_screen.dart';
 import '../meal/log_meal_screen.dart';
@@ -294,13 +295,55 @@ class DashboardTab extends ConsumerWidget {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const HealthHabitPlanScreen(),
-                            ),
-                          );
+                        onPressed: () async {
+                          final authService = ref.read(authServiceProvider);
+                          final hasStartDate =
+                              await authService.hasPlanStartDate();
+
+                          if (!hasStartDate && context.mounted) {
+                            // Show start date dialog
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (dialogContext) => StartDateDialog(
+                                onStartDateSelected:
+                                    (DateTime startDate) async {
+                                  try {
+                                    await authService
+                                        .savePlanStartDate(startDate);
+                                    if (context.mounted) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const HealthHabitPlanScreen(),
+                                        ),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              'Error saving start date: $e'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                              ),
+                            );
+                          } else {
+                            // Navigate directly to health plan
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const HealthHabitPlanScreen(),
+                              ),
+                            );
+                          }
                         },
                         icon: const Icon(Icons.calendar_month, size: 20),
                         label: const Text('View Your Health Habit Plan'),

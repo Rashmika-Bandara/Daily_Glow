@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../providers/services_provider.dart';
-import '../../models/health_plan_data.dart';
 import 'day_plan_detail_screen.dart';
 
 class HealthHabitPlanScreen extends ConsumerStatefulWidget {
@@ -17,6 +16,38 @@ class HealthHabitPlanScreen extends ConsumerStatefulWidget {
 class _HealthHabitPlanScreenState extends ConsumerState<HealthHabitPlanScreen> {
   DateTime _selectedStartDate = DateTime.now();
   int _currentDayIndex = 0;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStartDate();
+  }
+
+  Future<void> _loadStartDate() async {
+    final authService = ref.read(authServiceProvider);
+    final startDate = await authService.getPlanStartDate();
+
+    if (startDate != null && mounted) {
+      setState(() {
+        _selectedStartDate = startDate;
+        // Calculate which day of the plan we're on
+        final difference = DateTime.now().difference(_selectedStartDate).inDays;
+        if (difference >= 0 && difference < 7) {
+          _currentDayIndex = difference;
+        } else if (difference < 0) {
+          _currentDayIndex = 0;
+        } else {
+          _currentDayIndex = 6;
+        }
+        _isLoading = false;
+      });
+    } else if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   Future<void> _selectStartDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -40,18 +71,43 @@ class _HealthHabitPlanScreenState extends ConsumerState<HealthHabitPlanScreen> {
     );
 
     if (picked != null && picked != _selectedStartDate) {
-      setState(() {
-        _selectedStartDate = picked;
-        // Calculate which day of the plan we're on
-        final difference = DateTime.now().difference(_selectedStartDate).inDays;
-        if (difference >= 0 && difference < 7) {
-          _currentDayIndex = difference;
-        } else if (difference < 0) {
-          _currentDayIndex = 0;
-        } else {
-          _currentDayIndex = 6;
+      // Save the new start date to Firebase
+      final authService = ref.read(authServiceProvider);
+      try {
+        await authService.savePlanStartDate(picked);
+
+        if (mounted) {
+          setState(() {
+            _selectedStartDate = picked;
+            // Calculate which day of the plan we're on
+            final difference =
+                DateTime.now().difference(_selectedStartDate).inDays;
+            if (difference >= 0 && difference < 7) {
+              _currentDayIndex = difference;
+            } else if (difference < 0) {
+              _currentDayIndex = 0;
+            } else {
+              _currentDayIndex = 6;
+            }
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Start date updated successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
         }
-      });
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error updating start date: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -87,6 +143,39 @@ class _HealthHabitPlanScreenState extends ConsumerState<HealthHabitPlanScreen> {
   Widget build(BuildContext context) {
     final userData = ref.watch(currentUserDataProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Show loading indicator while loading start date
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Health Habit Plan'),
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      const Color(0xFF0F2027),
+                      const Color(0xFF203A43),
+                      const Color(0xFF2C5364),
+                    ]
+                  : [
+                      const Color(0xFF4158D0),
+                      const Color(0xFFC850C0),
+                      const Color(0xFFFFCC70),
+                    ],
+            ),
+          ),
+          child: const Center(
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(

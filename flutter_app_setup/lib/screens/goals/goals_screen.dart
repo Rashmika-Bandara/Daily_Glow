@@ -166,6 +166,106 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                                   : AppTheme.primaryLight,
                             ),
                           ),
+                          const SizedBox(height: 12),
+
+                          // Goal vs Daily Intake
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: isCompleted
+                                  ? Colors.green.withOpacity(0.1)
+                                  : AppTheme.primaryLight.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Column(
+                                  children: [
+                                    Icon(
+                                      Icons.flag,
+                                      color: isCompleted
+                                          ? Colors.green
+                                          : AppTheme.primaryLight,
+                                      size: 24,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Goal',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '${goal.targetValue.toInt()}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: isCompleted
+                                                ? Colors.green
+                                                : AppTheme.primaryLight,
+                                          ),
+                                    ),
+                                    Text(
+                                      goal is GoalForPhysicalActivity
+                                          ? goal.unit
+                                          : 'L',
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  width: 1,
+                                  height: 60,
+                                  color: Colors.grey.shade300,
+                                ),
+                                Column(
+                                  children: [
+                                    Icon(
+                                      Icons.trending_up,
+                                      color: Colors.orange,
+                                      size: 24,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Daily Intake',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '${goal.currentValue.toInt()}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.orange,
+                                          ),
+                                    ),
+                                    Text(
+                                      goal is GoalForPhysicalActivity
+                                          ? goal.unit
+                                          : 'L',
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                           const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -185,21 +285,6 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                                           ? Colors.green
                                           : AppTheme.primaryLight,
                                     ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.flag,
-                                size: 16,
-                                color: Colors.grey.shade600,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Target: ${goal.targetValue.toInt()} ${goal is GoalForPhysicalActivity ? goal.unit : 'L'}',
-                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ],
                           ),
