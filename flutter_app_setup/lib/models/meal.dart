@@ -1,10 +1,9 @@
-/// Represents a meal in the Daily Glow fitness tracking app.
+/// Represents a meal entry in the Daily Glow app.
 ///
-/// This class manages meal logging with detailed nutritional information,
-/// including macronutrient tracking, calorie counting, and meal planning
-/// capabilities for comprehensive nutrition management.
+/// Manages meal logging with nutritional details including macros,
+/// calories, and meal planning for comprehensive nutrition tracking.
 class Meal {
-  /// Unique identifier for this meal
+  /// Unique meal identifier
   String mealID;
 
   /// Type of meal (e.g., "breakfast", "lunch", "dinner", "snack")
@@ -54,7 +53,7 @@ class Meal {
     _validateMealData();
   }
 
-  /// Validates meal data for consistency and reasonable values
+  /// Validates meal data for consistency
   void _validateMealData() {
     if (calories < 0) {
       throw ArgumentError('Calories cannot be negative');
@@ -99,7 +98,7 @@ class Meal {
     );
   }
 
-  /// Views detailed meal information
+  /// Returns detailed meal information
   String viewMeals() {
     StringBuffer mealDetails = StringBuffer();
     mealDetails.writeln('=== ${mealType.toUpperCase()} ===');
@@ -215,7 +214,7 @@ class Meal {
     };
   }
 
-  /// Gets meal summary for display
+  /// Returns meal summary data
   Map<String, dynamic> getMealSummary() {
     Map<String, double> macroPercentages = getMacronutrientPercentages();
 
@@ -244,7 +243,7 @@ class Meal {
     };
   }
 
-  /// Generates daily meal summary from a list of meals
+  /// Generates daily summary from meal list
   static Map<String, dynamic> getDailySummary(List<Meal> dailyMeals) {
     if (dailyMeals.isEmpty) {
       return {
@@ -300,7 +299,7 @@ class Meal {
     };
   }
 
-  /// Gets calorie distribution by meal type
+  /// Calculates calorie distribution by type
   static Map<String, double> _getCalorieDistribution(List<Meal> meals) {
     Map<String, double> distribution = {};
     double totalCalories = meals.fold(0.0, (sum, meal) => sum + meal.calories);
@@ -318,7 +317,7 @@ class Meal {
     return distribution;
   }
 
-  /// Creates a meal plan suggestion based on calorie and macro targets
+  /// Suggests meal plan based on targets
   static List<Map<String, dynamic>> suggestMealPlan({
     required double dailyCalorieTarget,
     required double proteinTarget,
@@ -378,7 +377,7 @@ class Meal {
     ];
   }
 
-  /// Converts meal to JSON for storage
+  /// Converts meal to JSON
   Map<String, dynamic> toJson() {
     return {
       'mealID': mealID,
@@ -417,7 +416,7 @@ class Meal {
     return 'Meal($mealType: ${calories.toInt()}cal, P:${protein.toInt()}g C:${carbs.toInt()}g F:${fat.toInt()}g)';
   }
 
-  /// Brief string representation for lists
+  /// Returns brief string for lists
   String toBriefString() {
     return '$mealType - ${calories.toInt()}cal (${foodItems.length} items)';
   }
