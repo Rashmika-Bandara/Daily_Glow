@@ -43,8 +43,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         backgroundColor: isDark ? null : const Color(0xFFD6A3F7),
-        selectedItemColor: isDark ? null : Colors.white,
-        unselectedItemColor: isDark ? null : Colors.white.withOpacity(0.6),
+        selectedItemColor: isDark ? null : const Color(0xFF1F2937),
+        unselectedItemColor: isDark ? null : const Color(0xFF4B5563),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_outlined),

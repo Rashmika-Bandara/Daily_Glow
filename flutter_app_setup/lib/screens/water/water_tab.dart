@@ -79,7 +79,7 @@ class _WaterTabState extends ConsumerState<WaterTab> {
                               child: CircularProgressIndicator(
                                 value: progress,
                                 strokeWidth: 16,
-                                backgroundColor: Colors.grey.shade200,
+                                backgroundColor: const Color(0xFFBDBDBD),
                                 valueColor: const AlwaysStoppedAnimation<Color>(
                                   AppTheme.waterIntake,
                                 ),
