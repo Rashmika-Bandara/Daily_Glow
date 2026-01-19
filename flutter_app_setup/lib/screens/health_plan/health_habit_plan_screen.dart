@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../providers/services_provider.dart';
+import '../../models/health_plan_data.dart';
+import 'day_plan_detail_screen.dart';
 
 class HealthHabitPlanScreen extends ConsumerStatefulWidget {
   const HealthHabitPlanScreen({super.key});
@@ -295,9 +297,12 @@ class _HealthHabitPlanScreenState extends ConsumerState<HealthHabitPlanScreen> {
                           dayNumber: index + 1,
                           dayName: dayName,
                           date: dateStr,
+                          dayDate: dayDate,
                           isToday: isToday,
                           isDark: isDark,
+                          bmi: bmi,
                           bmiCategory: bmiCategory,
+                          categoryColor: categoryColor,
                         ),
                         const SizedBox(height: 12),
                       ],
@@ -325,9 +330,12 @@ class _HealthHabitPlanScreenState extends ConsumerState<HealthHabitPlanScreen> {
     required int dayNumber,
     required String dayName,
     required String date,
+    required DateTime dayDate,
     required bool isToday,
     required bool isDark,
+    required double? bmi,
     required String bmiCategory,
+    required Color categoryColor,
   }) {
     return Card(
       color: isDark ? null : Colors.white.withOpacity(0.95),
@@ -341,11 +349,16 @@ class _HealthHabitPlanScreenState extends ConsumerState<HealthHabitPlanScreen> {
       ),
       child: InkWell(
         onTap: () {
-          // TODO: Navigate to detailed day view
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Day $dayNumber plan will be shown here'),
-              backgroundColor: AppTheme.primaryLight,
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DayPlanDetailScreen(
+                dayNumber: dayNumber,
+                dayDate: dayDate,
+                bmi: bmi,
+                bmiCategory: bmiCategory,
+                categoryColor: categoryColor,
+              ),
             ),
           );
         },
