@@ -85,14 +85,18 @@ class AuthService {
             .limit(1)
             .get();
 
-        // If no notifications exist, send welcome notification
+        final userDoc = await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .get();
+        final username = userDoc.data()?['username'] ?? 'User';
+
+        // If no notifications exist, send welcome notification (first login)
         if (notificationsSnapshot.docs.isEmpty) {
-          final userDoc = await _firestore
-              .collection('users')
-              .doc(userCredential.user!.uid)
-              .get();
-          final username = userDoc.data()?['username'] ?? 'User';
           await _notificationService.sendWelcomeNotification(username);
+        } else {
+          // If notifications exist, send motivational notification (subsequent logins)
+          await _notificationService.sendMotivationalNotification(username);
         }
       }
 

@@ -148,8 +148,18 @@ class DashboardTab extends ConsumerWidget {
               _buildWelcomeCard(context, username, ref),
               const SizedBox(height: 20),
 
-              // Progress Ring
-              _buildProgressCard(context, todayProgress),
+              // Progress Ring and BMI Card side by side
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildProgressCard(context, todayProgress),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildBMICard(context, ref),
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
 
               // Streaks
@@ -456,6 +466,304 @@ class DashboardTab extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildBMICard(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return ref.watch(currentUserDataProvider).when(
+          data: (userData) {
+            final height = userData?['height'] as double?;
+            final weight = userData?['weight'] as double?;
+
+            // Calculate BMI
+            double? bmi;
+            String bmiCategory = '';
+            Color categoryColor = Colors.grey;
+            IconData categoryIcon = Icons.help_outline;
+
+            if (height != null && weight != null && height > 0) {
+              // Convert height from cm to meters
+              final heightInMeters = height / 100;
+              bmi = weight / (heightInMeters * heightInMeters);
+
+              // Determine category
+              if (bmi < 18.5) {
+                bmiCategory = 'Underweight';
+                categoryColor = const Color(0xFF60A5FA); // Blue
+                categoryIcon = Icons.trending_down;
+              } else if (bmi >= 18.5 && bmi < 25) {
+                bmiCategory = 'Normal weight';
+                categoryColor = const Color(0xFF10B981); // Green
+                categoryIcon = Icons.check_circle;
+              } else if (bmi >= 25 && bmi < 30) {
+                bmiCategory = 'Overweight';
+                categoryColor = const Color(0xFFF59E0B); // Orange
+                categoryIcon = Icons.trending_up;
+              } else {
+                bmiCategory = 'Obese';
+                categoryColor = const Color(0xFFEF4444); // Red
+                categoryIcon = Icons.warning;
+              }
+            }
+
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [
+                          const Color(0xFF7C3AED),
+                          const Color(0xFF9333EA),
+                        ]
+                      : [
+                          const Color(0xFFA78BFA),
+                          const Color(0xFFC4B5FD),
+                        ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF9333EA).withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: bmi == null
+                    ? Column(
+                        children: [
+                          Icon(
+                            Icons.monitor_weight,
+                            color: Colors.white.withOpacity(0.9),
+                            size: 48,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'BMI Calculator',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Add your height and weight in profile to calculate your BMI',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Colors.white.withOpacity(0.9),
+                                ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Your BMI',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                              ),
+                              Icon(
+                                Icons.monitor_weight,
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // BMI Value
+                              Column(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.3),
+                                        width: 3,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      bmi.toStringAsFixed(1),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'BMI',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Colors.white.withOpacity(0.9),
+                                        ),
+                                  ),
+                                ],
+                              ),
+                              // Category
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: categoryColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: categoryColor.withOpacity(0.4),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      categoryIcon,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      bmiCategory,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          // BMI Scale
+                          Container(
+                            height: 8,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF60A5FA), // Blue - Underweight
+                                  Color(0xFF10B981), // Green - Normal
+                                  Color(0xFFF59E0B), // Orange - Overweight
+                                  Color(0xFFEF4444), // Red - Obese
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '<18.5',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: Colors.white.withOpacity(0.8),
+                                    ),
+                              ),
+                              Text(
+                                '18.5-24.9',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: Colors.white.withOpacity(0.8),
+                                    ),
+                              ),
+                              Text(
+                                '25-29.9',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: Colors.white.withOpacity(0.8),
+                                    ),
+                              ),
+                              Text(
+                                '≥30',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: Colors.white.withOpacity(0.8),
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+              ),
+            );
+          },
+          loading: () => Container(
+            height: 150,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: isDark ? Colors.grey[800] : Colors.grey[300],
+            ),
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+          error: (_, __) => Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: isDark ? Colors.grey[800] : Colors.grey[300],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 48,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Unable to load BMI data',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
   }
 
   Widget _buildStreaksCard(BuildContext context, List<String> streaks) {
