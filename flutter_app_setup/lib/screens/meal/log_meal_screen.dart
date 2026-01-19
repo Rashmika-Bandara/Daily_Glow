@@ -55,7 +55,7 @@ class _LogMealScreenState extends ConsumerState<LogMealScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Meal logged successfully!'),
-              backgroundColor: AppTheme.mealColor,
+              backgroundColor: AppTheme.exerciseColor,
             ),
           );
           Navigator.pop(context);
@@ -77,39 +77,40 @@ class _LogMealScreenState extends ConsumerState<LogMealScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Log Meal'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Image.asset(
-              'assets/images/meal_illustration.png',
-              height: 35,
-              fit: BoxFit.contain,
-            ),
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? [
-                    const Color(0xFF0F2027),
-                    const Color(0xFF203A43),
-                    const Color(0xFF2C5364),
-                  ]
-                : [
-                    const Color(0xFF4158D0),
-                    const Color(0xFFC850C0),
-                    const Color(0xFFFFCC70),
-                  ],
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [
+                  const Color(0xFF0F2027),
+                  const Color(0xFF203A43),
+                  const Color(0xFF2C5364),
+                ]
+              : [
+                  const Color(0xFF4158D0),
+                  const Color(0xFFC850C0),
+                  const Color(0xFFFFCC70),
+                ],
         ),
-        child: SingleChildScrollView(
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text('Log Meal'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Icon(
+                Icons.restaurant,
+                size: 35,
+                color: AppTheme.exerciseColor,
+              ),
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Form(
             key: _formKey,
@@ -255,7 +256,7 @@ class _LogMealScreenState extends ConsumerState<LogMealScreen> {
                     _carbsController.text.isNotEmpty &&
                     _fatController.text.isNotEmpty)
                   Card(
-                    color: AppTheme.mealColor.withOpacity(0.1),
+                    color: Colors.white.withOpacity(0.15),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -297,7 +298,7 @@ class _LogMealScreenState extends ConsumerState<LogMealScreen> {
                   onPressed: _logMeal,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: AppTheme.mealColor,
+                    backgroundColor: AppTheme.exerciseColor,
                   ),
                   child: const Text('Log Meal', style: TextStyle(fontSize: 16)),
                 ),

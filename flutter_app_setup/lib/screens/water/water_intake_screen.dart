@@ -56,6 +56,7 @@ class _WaterIntakeScreenState extends ConsumerState<WaterIntakeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     // For now, using placeholder values since we're not tracking state in UI yet
     const todayTotal = 0.0;
     const dailyGoal = 2.5;
@@ -63,7 +64,25 @@ class _WaterIntakeScreenState extends ConsumerState<WaterIntakeScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Water Intake')),
-      body: SingleChildScrollView(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [
+                    const Color(0xFF0F2027),
+                    const Color(0xFF203A43),
+                    const Color(0xFF2C5364),
+                  ]
+                : [
+                    const Color(0xFF4158D0),
+                    const Color(0xFFC850C0),
+                    const Color(0xFFFFCC70),
+                  ],
+          ),
+        ),
+        child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
@@ -266,6 +285,7 @@ class _WaterIntakeScreenState extends ConsumerState<WaterIntakeScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }
