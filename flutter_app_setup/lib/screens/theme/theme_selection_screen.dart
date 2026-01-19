@@ -53,10 +53,11 @@ class ThemeSelectionScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
                       Text(
                         'Choose Your Theme',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? null : Colors.black87,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? null : Colors.black87,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
@@ -210,23 +211,19 @@ class ThemeSelectionScreen extends ConsumerWidget {
                       children: [
                         Text(
                           title,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? null : Colors.black87,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? null : Colors.black87,
+                                  ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           description,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(
-                                color: isDark ? null : Colors.black54,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: isDark ? null : Colors.black54,
+                                  ),
                         ),
                       ],
                     ),

@@ -260,7 +260,7 @@ class ProfileTab extends ConsumerWidget {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final showBadge = badgeCount != null && badgeCount > 0;
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       color: isDark ? null : Colors.white.withOpacity(0.95),
@@ -289,7 +289,7 @@ class ProfileTab extends ConsumerWidget {
                   ),
                   child: Center(
                     child: Text(
-                      badgeCount! > 99 ? '99+' : badgeCount.toString(),
+                      badgeCount > 99 ? '99+' : badgeCount.toString(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 10,

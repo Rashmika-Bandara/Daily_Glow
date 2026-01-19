@@ -14,12 +14,12 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   late TextEditingController _usernameController;
   late TextEditingController _ageController;
   late TextEditingController _heightController;
   late TextEditingController _weightController;
-  
+
   String _selectedGender = 'male';
   String _selectedAvatar = 'boy';
   bool _isLoading = false;
@@ -47,17 +47,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       _usernameController.text = userData['username'] ?? '';
       _selectedGender = userData['gender'] ?? 'male';
       _selectedAvatar = userData['avatar'] ?? 'boy';
-      
+
       final age = userData['age'];
       if (age != null) {
         _ageController.text = age.toString();
       }
-      
+
       final height = userData['height'];
       if (height != null) {
         _heightController.text = height.toString();
       }
-      
+
       final weight = userData['weight'];
       if (weight != null) {
         _weightController.text = weight.toString();
@@ -74,19 +74,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     try {
       final authService = ref.read(authServiceProvider);
-      
+
       await authService.updateProfile(
         username: _usernameController.text.trim(),
         gender: _selectedGender,
         avatar: _selectedAvatar,
-        age: _ageController.text.isNotEmpty 
-            ? int.parse(_ageController.text) 
+        age: _ageController.text.isNotEmpty
+            ? int.parse(_ageController.text)
             : null,
-        height: _heightController.text.isNotEmpty 
-            ? double.parse(_heightController.text) 
+        height: _heightController.text.isNotEmpty
+            ? double.parse(_heightController.text)
             : null,
-        weight: _weightController.text.isNotEmpty 
-            ? double.parse(_weightController.text) 
+        weight: _weightController.text.isNotEmpty
+            ? double.parse(_weightController.text)
             : null,
       );
 
@@ -231,7 +231,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                     ),
                               ),
                               const SizedBox(height: 16),
-                              
+
                               // Username
                               TextFormField(
                                 controller: _usernameController,
@@ -277,7 +277,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                       value: 'male',
                                       groupValue: _selectedGender,
                                       onChanged: (value) {
-                                        setState(() => _selectedGender = value!);
+                                        setState(
+                                            () => _selectedGender = value!);
                                       },
                                       activeColor: AppTheme.primaryLight,
                                       contentPadding: EdgeInsets.zero,
@@ -294,7 +295,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                       value: 'female',
                                       groupValue: _selectedGender,
                                       onChanged: (value) {
-                                        setState(() => _selectedGender = value!);
+                                        setState(
+                                            () => _selectedGender = value!);
                                       },
                                       activeColor: AppTheme.primaryLight,
                                       contentPadding: EdgeInsets.zero,
@@ -346,14 +348,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 style: TextStyle(
                                   color: isDark ? null : Colors.black87,
                                 ),
-                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
                                 inputFormatters: [
-                                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d+\.?\d{0,2}')),
                                 ],
                                 validator: (value) {
                                   if (value != null && value.isNotEmpty) {
                                     final height = double.tryParse(value);
-                                    if (height == null || height < 50 || height > 300) {
+                                    if (height == null ||
+                                        height < 50 ||
+                                        height > 300) {
                                       return 'Please enter a valid height (50-300 cm)';
                                     }
                                   }
@@ -375,14 +382,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 style: TextStyle(
                                   color: isDark ? null : Colors.black87,
                                 ),
-                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
                                 inputFormatters: [
-                                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d+\.?\d{0,2}')),
                                 ],
                                 validator: (value) {
                                   if (value != null && value.isNotEmpty) {
                                     final weight = double.tryParse(value);
-                                    if (weight == null || weight < 20 || weight > 500) {
+                                    if (weight == null ||
+                                        weight < 20 ||
+                                        weight > 500) {
                                       return 'Please enter a valid weight (20-500 kg)';
                                     }
                                   }
@@ -409,12 +421,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                   width: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
                                   ),
                                 )
                               : const Text(
                                   'Save Changes',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
                         ),
                       ),
